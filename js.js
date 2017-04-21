@@ -83,7 +83,7 @@ var Konto = function(id, saldo, ejer, rentefod)
 		
 		that.validerUdtraek = function(belob)
 		{
-			if(saldo >= belob)
+			if(saldo >= belob && belob > 0)
 			{
 				return(true)
 			}
@@ -96,6 +96,23 @@ var Konto = function(id, saldo, ejer, rentefod)
 		}
 	}
 	else{throw("Fejl i enten id'et eller saldo'en eller ejer")}
+	
+	return(that)
+}
+
+var KasseKradit = function(id, saldo, ejer, rentefod, overtrek)
+{
+
+	var that = Konto(id, saldo, ejer, rentefod)
+	
+	that.validerUdtraek = function(belob)
+	{
+		if(that.saldo + overtrek >= belob && belob > 0)
+		{
+			return(true)
+		}
+		else{return(false)}
+	}
 	
 	return(that)
 }
@@ -148,9 +165,21 @@ var TellerMachine = function()
 		return(o.udfor())
 	}
 	return(that)
-} 
+}
 
-
+var ATM = function(id, saldo)
+{
+	var that = TellerMachine()
+	
+	var id = id
+	var saldo = saldo
+	
+	that.vaelg = function(valg)
+	{
+		var belob = 0
+	}
+	
+}
 
 hej = Konto(0000, 1000, "Jhon", 0.02);
 hej2 = Konto(0001, 100, "Hansen", 0.04);
