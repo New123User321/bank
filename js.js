@@ -48,19 +48,6 @@ var Konto = function(id, saldo, ejer, rentefod)
 					return(saldo)
 				},
 				enumerable: true
-//				"set": function(tilId, belob)
-//				{
-//					if(typeof(TilId) == "number" && typeof(belob) == "number")
-//					{
-//						if(saldo >= belob)
-//						{
-//							saldo = saldo - belob
-//							Transaktioner.add({"fra":id, "til": tilId, "belob": belob})
-//						}
-//						else{throw("ikke nok på saldoen")}
-//					}
-//					else{throw("fejl ved id'et eller beløbet")}
-//				}
 			}
 		);
 		
@@ -169,18 +156,37 @@ var TellerMachine = function()
 
 var ATM = function(id, saldo)
 {
-	var that = TellerMachine()
+	var that = {}
 	
-	var id = id
-	var saldo = saldo
+	var id = id;
+	var saldo = saldo;
 	
-	that.vaelg = function(valg)
+	that.haev = function(fraKonto, belob)
 	{
-		var belob = 0
+		if(belob <= 10000 && belob <= saldo)
+		{
+			saldo = saldo - belob
+			var o = Transaktion(fraKonto, kontant, belob, that)
+			return(o.udfor())
+		}
+		else{throw("fejl du må ikke hæve over 10000")}
 	}
 	
+	that.indsaed = function(tilKonto, belob)
+	{
+		var belob = belob
+		if(belob <= 10000)
+		{
+			var o = Transaktion(kontant, tilKonto, belob, that)
+			return(o.udfor())
+		}
+		else{throw("fejl du må ikke indsætte over 10000")}
+	}
+	
+	return(that)
 }
 
-hej = Konto(0000, 1000, "Jhon", 0.02);
-hej2 = Konto(0001, 100, "Hansen", 0.04);
+kontant = Konto(0000, 100, "kontant", 0)
+hej = Konto(0001, 1000, "Jhon", 0.02);
+hej2 = Konto(0002, 100, "Hansen", 0.04);
 teller = TellerMachine();
