@@ -142,6 +142,62 @@ var Transaktion = function(fraKonto, tilKonto, belob, teller)
 	else{throw("Fejl ved fra konten, til konten, beløbet eller telleren")}
 }
 
+var ATMtransaktion = function(kontoen, atm, belob, ATMid)
+{
+	var that = Transaktion(kontoen, atm, belob, ATMid)
+	
+	var kontoen = kontoen
+	var atm = atm
+	var belob = belob
+	var ATMid = ATMid
+	
+	var erBrugt = false
+	
+	that.udfor = function(indUd)
+	{
+	//ind på konto
+		if(indUd == "ind")
+		{
+			if(that.valider() == true)
+			{
+				kontoen.indsaet(belob)
+				Transaktioner.add({"fra": atm, "til": kontoen, "belob": belob, "teller":ATMid})
+				erBrugt = true
+				return("du indsatte: " + belob + "kr på din konto")
+			}
+			else{return("kan ikke valider indætingen")}
+			
+		}
+		else if(indUd == "ud")
+		{
+			if(that.valider() == true)
+			{
+				atm.udtraek(belob)
+				kontoen.udtraek(belob)
+				Transaktioner.add({"fra": kontoen, "til": atm, "belob": belob, "teller":ATMid})
+				erBrugt = true
+				return("du hævet: " + belob + "kr fra din konto")
+			}
+			else{return("kan ikke valider hævningen")}
+		}
+		else{throw("ERROR")}
+	}
+/*	
+	that.udfor = function()
+	{
+		if(that.valider() == true)
+		{
+			fraKonto.udtraek(belob)
+			tilKonto.indsaed(belob)
+			Transaktioner.add({"fra": JSON.stringify(fraKonto), "til": JSON.stringify(tilKonto), "belob": belob, "ATM": ATMid})
+			erBrugt = true;
+			return("gik igemmen")
+		}
+		else{return("kan ikke valider")}
+	}**/
+	return(that)
+}
+
 var TellerMachine = function()
 {
 	var that = {}
@@ -161,32 +217,59 @@ var ATM = function(id, saldo)
 	var id = id;
 	var saldo = saldo;
 	
-	that.haev = function(fraKonto, belob)
-	{
-		if(belob <= 10000 && belob <= saldo)
+	Object.defineProperty
+	(
+		that, "id",
 		{
-			saldo = saldo - belob
-			var o = Transaktion(fraKonto, kontant, belob, that)
-			return(o.udfor())
+			"get":function()
+			{
+				return(id)
+			},
+			enumerable: true
 		}
-		else{throw("fejl du må ikke hæve over 10000")}
+	)
+		
+	Object.defineProperty
+	(
+		that, "saldo", 
+		{
+			"get": function()
+			{
+				return(saldo)
+			},
+			enumerable: true
+		}
+	);
+	
+	that.udfor = function(kontoen, belob, indUd)
+	{
+		var o = ATMtransaktion(kontoen, that, belob, that)
+		return(o.udfor(indUd))
 	}
 	
-	that.indsaed = function(tilKonto, belob)
+	that.udtraek = function(belob)
 	{
-		var belob = belob
-		if(belob <= 10000)
+		saldo = saldo - belob
+	}
+	
+	that.validerUdtraek = function(belob)
+	{
+		if(saldo >= belob && belob >= 0 && belob <= 10000)
 		{
-			var o = Transaktion(kontant, tilKonto, belob, that)
-			return(o.udfor())
+			return(true)
 		}
-		else{throw("fejl du må ikke indsætte over 10000")}
+		else{return(false)}
+	}
+	
+	that.validerIndaet = function()
+	{
+		return(true)
 	}
 	
 	return(that)
 }
 
-kontant = Konto(0000, 100, "kontant", 0)
+kontant = Konto(0000, 100, "kontant", 0);
 hej = Konto(0001, 1000, "Jhon", 0.02);
 hej2 = Konto(0002, 100, "Hansen", 0.04);
 teller = TellerMachine();
