@@ -144,7 +144,7 @@ var Transaktion = function(fraKonto, tilKonto, belob, teller)
 
 var ATMtransaktion = function(kontoen, atm, belob, ATMid)
 {
-	var that = Transaktion(kontoen, atm, belob, ATMid)
+	var that = {}//Transaktion(kontoen, atm, belob, ATMid)
 	
 	var kontoen = kontoen
 	var atm = atm
@@ -158,7 +158,7 @@ var ATMtransaktion = function(kontoen, atm, belob, ATMid)
 	//ind på konto
 		if(indUd == "ind")
 		{
-			if(that.valider() == true)
+			if(kontoen.validerIndaet() == true)
 			{
 				kontoen.indsaet(belob)
 				Transaktioner.add({"fra": atm, "til": kontoen, "belob": belob, "teller":ATMid})
@@ -170,13 +170,17 @@ var ATMtransaktion = function(kontoen, atm, belob, ATMid)
 		}
 		else if(indUd == "ud")
 		{
-			if(that.valider() == true)
+			if(kontoen.validerUdtraek(belob) == true && atm.validerUdtraek(belob))
 			{
 				atm.udtraek(belob)
 				kontoen.udtraek(belob)
 				Transaktioner.add({"fra": kontoen, "til": atm, "belob": belob, "teller":ATMid})
 				erBrugt = true
 				return("du hævet: " + belob + "kr fra din konto")
+			}
+			else if(belob > 10000)
+			{
+				return("du kan ikke hæve over 10000kr")
 			}
 			else{return("kan ikke valider hævningen")}
 		}
@@ -254,7 +258,7 @@ var ATM = function(id, saldo)
 	
 	that.validerUdtraek = function(belob)
 	{
-		if(saldo >= belob && belob >= 0 && belob <= 10000)
+		if(saldo >= belob && belob > 0 && belob <= 10000)
 		{
 			return(true)
 		}
