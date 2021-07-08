@@ -2,7 +2,11 @@
 
 
 class Konto {
+    - id
     - saldo
+    - ejer
+    - rente
+
     + getSaldo()
     - setSaldo()
 
@@ -31,7 +35,7 @@ Object KontantKonto
 KontantKonto .up.|> Konto
 
 abstract class TellerMachine {
-    + udførTransaktion()
+    + udførTransaktion(afsender, modtager, beløb)
     - kontantKonto
 }
 TellerMachine *-up-> KontantKonto
@@ -49,10 +53,15 @@ TellerMachine <|-- ATM
 Konto "2" <..o Transaktion
 
 class Transaktion {
+ + Transaktion(teller, afsenderKonto, modtagerKonto, beloeb)
  - TellerMachine Teller
  - Konto
  - ModtagerKonto
- + validerTransaktion()
+ - beløb
+ - tidsstempel
+ # succes
+ + valider()
+ + udfør()
 }
 
 class KontantTransaktion {
